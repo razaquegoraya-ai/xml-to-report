@@ -1,38 +1,45 @@
 from dash import Dash, dcc, html
 import plotly.express as px
 import pandas as pd
-import logging
-
-logging.basicConfig(
-    filename="../logs/error.log",
-    level=logging.ERROR,
-    format="%(asctime)s:%(levelname)s:%(message)s",
-)
 
 def run_dashboard():
+    # Load parsed data
     try:
-        df = pd.read_csv("../data/parsed_data.csv")
-    except FileNotFoundError as e:
-        logging.error(f"Data file not found: {e}")
-        print("Error: Parsed data file not found. Please run parse_xml.py first.")
+        df = pd.read_csv("data/parsed_data.csv")
+
+        # Strip whitespace from column names
+        df.columns = df.columns.str.strip()
+
+    except FileNotFoundError:
+        print("Parsed data file not found. Run parse_xml.py first.")
         return
 
+    # Create the dashboard app
     app = Dash(__name__)
 
-    fig = px.bar(
+    # Bar chart for total savings by employee
+    fig_savings = px.bar(
         df,
-        x="Employer_Name",
-        y="Contribution_Percentage",
-        title="Employer Contributions",
-        labels={"Employer_Name": "Employer", "Contribution_Percentage": "Contribution %"},
+        x="Employee_Name",
+        y="Total_Savings",
+        title="Total Savings by Employee",
+        labels={"Employee_Name": "Employee", "Total_Savings": "Total Savings"},
+    )
+
+    # Pie chart for policy statuses
+    fig_status = px.pie(
+        df,
+        names="Status",
+        title="Policy Status Distribution",
     )
 
     app.layout = html.Div([
         html.H1("Pension Plan Dashboard"),
-        dcc.Graph(figure=fig)
+        dcc.Graph(figure=fig_savings),
+        dcc.Graph(figure=fig_status),
     ])
 
     app.run_server(debug=True)
 
-# Uncomment for standalone testing
-# run_dashboard()
+if __name__ == "__main__":
+    run_dashboard()
