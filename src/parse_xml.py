@@ -1,9 +1,15 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 import logging
+import os
 
+# Ensure the logs directory exists
+LOG_DIR = "../logs"
+os.makedirs(LOG_DIR, exist_ok=True)
+
+# Configure logging
 logging.basicConfig(
-    filename="../logs/error.log",
+    filename=f"{LOG_DIR}/error.log",
     level=logging.ERROR,
     format="%(asctime)s:%(levelname)s:%(message)s",
 )
@@ -34,5 +40,5 @@ def parse_xml(file_path):
         logging.error(f"Error parsing XML: {e}")
         print("An error occurred while parsing the XML file. Check logs for details.")
 
-# Uncomment for standalone testing
+# Uncomment to test the function
 # parse_xml("../data/sample.xml")
